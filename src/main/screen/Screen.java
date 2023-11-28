@@ -34,7 +34,7 @@ public class Screen {
 		font = game.getDisplay().getFont();
 	}
 	
-	public Map getMap() {
+	public Map getMap() {	
 		return map;
 	}
 	
