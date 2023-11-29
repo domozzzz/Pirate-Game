@@ -1,4 +1,4 @@
-package main.screen.menu;
+package main.menu;
 
 import main.Game;
 import main.Input;
@@ -95,7 +95,7 @@ public class FightMenu extends Menu {
 			if (passive) {
 				if (input.enter) {
 					switch(selected) {
-						case 0 -> game.setScreen(game.levelScreen);
+						case 0 -> game.setLevel(game.getLevel());
 					}
 					playerTurn = false;
 				}

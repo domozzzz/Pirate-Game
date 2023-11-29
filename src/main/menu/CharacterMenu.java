@@ -1,3 +1,4 @@
+package main.menu;
 //package main.screen.menu;
 //
 //import java.awt.Color;

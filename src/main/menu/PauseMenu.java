@@ -1,4 +1,4 @@
-package main.screen.menu;
+package main.menu;
 
 import main.Game;
 import main.Input;

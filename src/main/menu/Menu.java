@@ -1,20 +1,24 @@
-package main.screen.menu;
+package main.menu;
 
 import main.Game;
 import main.Input;
-import main.screen.Screen;
+import main.gfx.Display;
+import main.gfx.Font;
 
-public class Menu extends Screen {
+public abstract class Menu {
 	
 	protected int selected = 0;
 	protected int MAX_SELECTION = 0;
 	protected final Input input;
+	protected Game game;
+	protected Font font;
 	
 	public Menu(Game game, Input input) {
-		super(game);
+		this.game = game;
 		this.input = input;
+		this.font = game.getDisplay().getFont();
 	}
-	
+
 	public void tick() {
 		if (input.up)
 			selected--;
@@ -30,4 +34,6 @@ public class Menu extends Screen {
 		
 		input.clear();
 	}
+
+	public abstract void render(Display display);
 }
