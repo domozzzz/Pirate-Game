@@ -1,11 +1,15 @@
-package main.screen.level;
+package main;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.Vector;
 
-import main.Game;
 import main.entity.Entity;
+import main.entity.Map;
 import main.entity.mob.Ghost;
 import main.entity.mob.Human;
+import main.entity.mob.Mob;
+import main.entity.mob.Player;
 import main.entity.tile.Chest;
 import main.entity.tile.Door;
 import main.entity.tile.Floor;
@@ -14,42 +18,66 @@ import main.entity.tile.Wall;
 import main.entity.tile.Water;
 import main.gfx.Display;
 import main.io.IO;
-import main.screen.Screen;
 
-public class Level extends Screen {
+public class Level {
 	
 	public static final String[] maps = {"/res/maps/map00.txt" , "/res/maps/map01.txt", "/res/maps/map02.txt"};
-	private int mobCount = 20;
+	public static final int[][] spawns = {{1,1}, {12,1}, {12, 1}};
+	private int mobCount = 5;
+	protected ArrayList<Entity> entities = new ArrayList<>();
+	public Tile[] tiles = new Tile[9999];
+	public static final int TILE_SIZE = 16;
+	protected final int CAMERA_TILE_WIDTH = 16;
+	protected final int CAMERA_TILE_HEIGHT = 16;
+	private Map map;
+	private Player player;
+	private Game game;
 	
 	public Level(Game game, int mapNum) {
-		super(game);
 		map = IO.loadMap(maps[mapNum]);
+		this.game = game;
 		loadTiles();
 	}
 
-	@Override
 	public void tick() {
-		super.tick();
 		
-		for (int i = 0; i < getTiles().length; i++) {
-			if (getTiles()[i] != null) {
-				getTiles()[i].tick();
+		if (player != null) {
+			player.tick();
+		}
+		
+		for (int i = 0; i < entities.size(); i++) {
+			entities.get(i).tick();
+		}
+		
+		for (int i = 0; i < tiles.length; i++) {
+			if (tiles[i] != null) {
+				tiles[i].tick();
 			}
 		}
 	}
 	
-	@Override
 	public void render(Display display) {
 		//render tiles
 		for (int x = 0; x < map.cols ; x++) {
 			for (int y = 0; y < map.rows; y++) {
-				Tile tile = getTiles()[map.tileMap[x + y*map.cols]];
+				Tile tile = tiles[map.tileMap[x + y*map.cols]];
 				if (x - display.xScroll <= CAMERA_TILE_WIDTH && y - display.yScroll <= CAMERA_TILE_HEIGHT) {
 					tile.render(display, x, y, 0);
 				}
 			}
 		}
-		super.render(display);
+		
+		if (player != null) {
+			player.render(display);
+		}
+		
+		for (int i = 0; i < entities.size(); i++) {
+			entities.get(i).render(display);
+		}
+	}
+	
+	public void removeMob(Mob mob) {
+		entities.remove(mob);
 	}
 	
 	//Divide for pixels to coordinates
@@ -88,6 +116,14 @@ public class Level extends Screen {
 		return null;
 	}
 	
+	public int getTileTopLeftX(int x) {
+		return x/CAMERA_TILE_WIDTH;
+	}
+	
+	public int getTileTopLeftY(int y) {
+		return y/CAMERA_TILE_HEIGHT*map.cols;
+	}
+	
 	public boolean isSameTile(int tileNum, int x, int y) {
 		int gridPos = x/CAMERA_TILE_WIDTH + y/CAMERA_TILE_HEIGHT*map.cols;
 		
@@ -103,8 +139,30 @@ public class Level extends Screen {
 			map.tileMap[gridPos] = tileNum;
 		}
 	}
+	
+	public void addEntity(Entity entity) {
+		entities.add(entity);
+		
+	}
+
+	public void removeEntity(Entity entity) {
+		entities.remove(entity);
+		
+	}
+	
+	public void addPlayer(Player player) {
+		this.player = player;
+	}
+	
+	public void removePlayer() {
+		entities.remove(player);
+	}
 
 	public void removeTile(int x, int y) {	
 		addTile(0, x, y);
+	}
+
+	public Map getMap() {
+		return map;
 	}
 }

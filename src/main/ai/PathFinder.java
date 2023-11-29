@@ -23,17 +23,17 @@ public class PathFinder {
 	}
 	
 	public void instantiateNodes() {
-		node = new Node[game.levelScreen.getMap().cols][game.levelScreen.getMap().rows];
+		node = new Node[game.getLevel().getMap().cols][game.getLevel().getMap().rows];
 		
 		int col = 0;
 		int row = 0;
 		
-		while (col < game.levelScreen.getMap().cols && row < game.levelScreen.getMap().rows) {
+		while (col < game.getLevel().getMap().cols && row < game.getLevel().getMap().rows) {
 			
 			node[col][row] = new Node(row, col);
 			
 			col++;
-			if (col == game.levelScreen.getMap().cols) {
+			if (col == game.getLevel().getMap().cols) {
 				col = 0;
 				row++;
 			}
@@ -56,9 +56,9 @@ public class PathFinder {
 		int col = 0;
 		int row = 0;
 		
-		while (col < game.levelScreen.getMap().cols && row < game.levelScreen.getMap().rows)  {
+		while (col < game.getLevel().getMap().cols && row < game.getLevel().getMap().rows)  {
 			
-			int tileNum = game.levelScreen.getMap().tileMap[game.levelScreen.getMap().cols * row + col];
+			int tileNum = game.getLevel().getMap().tileMap[game.getLevel().getMap().cols * row + col];
 			if (tileNum == 1)  {
 				node[col][row].solid = true;
 				//game.getDisplay().render(SpriteSheet.getSpriteImage(2*16, 7*16, 16, 16), col*16, row*16, 0);
@@ -67,7 +67,7 @@ public class PathFinder {
 			getCost(node[col][row]);
 			
 			col++;
-			if (col == game.levelScreen.getMap().cols) {
+			if (col == game.getLevel().getMap().cols) {
 				col = 0;
 				row++;
 			}
@@ -103,10 +103,10 @@ public class PathFinder {
 			if (col - 1 >= 0)  {
 				openNode(node[col-1][row]);
 			}
-			if (row + 1 < game.levelScreen.getMap().rows)  {
+			if (row + 1 < game.getLevel().getMap().rows)  {
 				openNode(node[col][row+1]);
 			}
-			if (col + 1 < game.levelScreen.getMap().cols)  {
+			if (col + 1 < game.getLevel().getMap().cols)  {
 				openNode(node[col+1][row]);
 			}
 			
@@ -169,7 +169,7 @@ public class PathFinder {
 		int col = 0;
 		int row = 0;
 		
-		while (col < game.levelScreen.getMap().cols && row < game.levelScreen.getMap().rows)  {
+		while (col < game.getLevel().getMap().cols && row < game.getLevel().getMap().rows)  {
 			
 			node[col][row].open = false;
 			node[col][row].checked = false;
@@ -177,7 +177,7 @@ public class PathFinder {
 			
 			col++;
 			
-			if (col == game.levelScreen.getMap().cols) {
+			if (col == game.getLevel().getMap().cols) {
 				col = 0;
 				row++;
 			}

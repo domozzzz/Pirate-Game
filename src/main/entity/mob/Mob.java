@@ -4,10 +4,10 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import main.Game;
+import main.Level;
 import main.entity.Entity;
 import main.gfx.Display;
 import main.gfx.SpriteSheet;
-import main.screen.level.Level;
 
 public abstract class Mob extends Entity {
 	
@@ -46,10 +46,10 @@ public abstract class Mob extends Entity {
 	}
 	
 	protected boolean isCollision() {
-		if (((Level) game.getScreen()).getTileAt(x + getRect().x, y + getRect().y).isCollision() 
-				|| ((Level) game.getScreen()).getTileAt(x + getRect().x + getRect().width, y + getRect().y + getRect().height).isCollision()
-				|| ((Level) game.getScreen()).getTileAt(x + getRect().x + getRect().width, y + getRect().y).isCollision() 
-				|| ((Level) game.getScreen()).getTileAt(x + getRect().x, y + getRect().y + getRect().height).isCollision()) {
+		if ((game.getLevel()).getTileAt(x + getRect().x, y + getRect().y).isCollision() 
+				|| game.getLevel().getTileAt(x + getRect().x + getRect().width, y + getRect().y + getRect().height).isCollision()
+				|| game.getLevel().getTileAt(x + getRect().x + getRect().width, y + getRect().y).isCollision() 
+				|| game.getLevel().getTileAt(x + getRect().x, y + getRect().y + getRect().height).isCollision()) {
 			return true;
 		}
 		return false;
@@ -84,7 +84,7 @@ public abstract class Mob extends Entity {
 	protected void isDead() {
 		if (hp <= 0) {
 			game.getAudio().playAudio(DEATH_SOUND);
-			game.levelScreen.removeMob(this);
+			game.getLevel().removeMob(this);
 		}
 	}
 }

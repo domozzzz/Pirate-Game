@@ -26,7 +26,7 @@ public class Pistol extends Item {
 	public void use() {
 		if (!cooldown && game.getPlayer().getInv().contains(Ammo.class)) {
 			
-			game.getScreen().addEntity(new Bullet(game, game.getPlayer().x,
+			game.getLevel().addEntity(new Bullet(game, game.getPlayer().x,
 					game.getPlayer().y,
 					game.getPlayer().getXDir(), game.getPlayer().getYDir()));
 			

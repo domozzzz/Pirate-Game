@@ -30,6 +30,6 @@ public class IcePick extends Item {
 
 	@Override
 	public void use() {
-		game.levelScreen.player.placeTile(new Water());
+		game.getPlayer().placeTile(new Water());
 	}
 }

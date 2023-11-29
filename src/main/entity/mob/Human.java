@@ -27,7 +27,7 @@ public class Human extends Mob {
 		pathFinder = new PathFinder(game);
 		loadImages();
 		image = frontWalk;
-		map = game.levelScreen.getMap();
+		map = game.getLevel().getMap();
 		hp = 10;
 		spawn();
 		onPath = true;
@@ -52,10 +52,6 @@ public class Human extends Mob {
 		
 		if (pathFinder.search() == true) {
 			
-			//for (Node node : pathFinder.pathList) {
-				//game.getDisplay().render(back, node.col*16, node.row*16, 0);
-			//}
-			
 			int xd = pathFinder.pathList.get(0).col * 16 - x;
 			int yd = pathFinder.pathList.get(0).row * 16 - y;
 			
@@ -65,7 +61,7 @@ public class Human extends Mob {
 			if (xd > 0) x++;
 		}
 		
-		int xd = game.getScreen().player.x - x;
+		int xd = game.getPlayer().x - x;
 		int yd = game.getPlayer().y - y;
 		
 		if (xd * xd + yd * yd < 15 * 15) {
@@ -124,7 +120,7 @@ public class Human extends Mob {
 		do {
 			x = random.nextInt(map.pw);
 			y = random.nextInt(map.ph);
-			xd = game.getScreen().player.x - x;
+			xd = game.getPlayer().x - x;
 			yd = game.getPlayer().y - y;
 		} while (isCollision() || xd * xd + yd * yd < 100 * 100);
 		
@@ -145,7 +141,7 @@ public class Human extends Mob {
 	protected void isDead() {
 		super.isDead();
 		if (hp <= 0) {
-			game.levelScreen.addEntity(new ItemEntity(new Ammo(),new Ammo().img, x, y));
+			game.getLevel().addEntity(new ItemEntity(new Ammo(),new Ammo().img, x, y));
 		}
 	}
 	

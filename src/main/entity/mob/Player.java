@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 
 import main.Game;
 import main.Input;
+import main.Level;
 import main.Item.FishingRod;
 import main.Item.IcePick;
 import main.Item.Inventory;
@@ -20,8 +21,6 @@ import main.entity.tile.Water;
 import main.gfx.Display;
 import main.gfx.SpriteSheet;
 import main.gfx.particle.Particle;
-import main.screen.level.Level;
-import main.screen.menu.FightMenu;
 
 public class Player extends Mob {
 	
@@ -52,7 +51,7 @@ public class Player extends Mob {
 		inventory = new Inventory(game, this);
 		
 		createHitbox();
-		resetStats();
+		reset();
 		loadImages();
 		
 		screenCenterX = game.getDisplay().cameraWidth/2;
@@ -118,20 +117,20 @@ public class Player extends Mob {
 			switch (lastDir) {
 			
 				case 'u': 
-					i = game.getScreen().getTileTopLeftX(getMiddleX());
-					j = game.getScreen().getTileTopLeftX(y + midRectY - BUILD_REACH);
+					i = game.getLevel().getTileTopLeftX(getMiddleX());
+					j = game.getLevel().getTileTopLeftX(y + midRectY - BUILD_REACH);
 					break;
 				case 'd':
-					i = game.getScreen().getTileTopLeftX(getMiddleX());
-					j = game.getScreen().getTileTopLeftX(y + midRectY + BUILD_REACH);
+					i = game.getLevel().getTileTopLeftX(getMiddleX());
+					j = game.getLevel().getTileTopLeftX(y + midRectY + BUILD_REACH);
 					break;
 				case 'l':
-					i = game.getScreen().getTileTopLeftX(getMiddleX() - BUILD_REACH);
-					j = game.getScreen().getTileTopLeftX(y + midRectY);
+					i = game.getLevel().getTileTopLeftX(getMiddleX() - BUILD_REACH);
+					j = game.getLevel().getTileTopLeftX(y + midRectY);
 					break;
 				case 'r':
-					i = game.getScreen().getTileTopLeftX(getMiddleX() + BUILD_REACH);
-					j = game.getScreen().getTileTopLeftX( y + midRectY);
+					i = game.getLevel().getTileTopLeftX(getMiddleX() + BUILD_REACH);
+					j = game.getLevel().getTileTopLeftX( y + midRectY);
 					break;
 			}
 			
@@ -178,14 +177,12 @@ public class Player extends Mob {
 	}
 	
 	public void handleInputs() {
-		if (!(game.getScreen() instanceof FightMenu)) {
-			if (!frozen) {
-				handleMovements();
-			}
-			handleActions();
-			if (frozen) {
-				inventory.gui();
-			}
+		if (!frozen) {
+			handleMovements();
+		}
+		handleActions();
+		if (frozen) {
+			inventory.gui();
 		}
 	}
 
@@ -296,39 +293,39 @@ public class Player extends Mob {
 		
 		// search for entity
 		switch (lastDir) {
-			case 'u' -> entity = ((Level) game.getScreen()).getEntityAt(new Rectangle(getMiddleX(), getMiddleY() - REACH/2));
-			case 'd' -> entity = ((Level) game.getScreen()).getEntityAt(new Rectangle(getMiddleX(), getMiddleY() + REACH));
-			case 'l' -> entity = ((Level) game.getScreen()).getEntityAt(new Rectangle(getMiddleX() - REACH, getMiddleY()));
-			case 'r' -> entity = ((Level) game.getScreen()).getEntityAt(new Rectangle(getMiddleX() + REACH, getMiddleY()));
+			case 'u' -> entity = ((Level) game.getLevel()).getEntityAt(new Rectangle(getMiddleX(), getMiddleY() - REACH/2));
+			case 'd' -> entity = ((Level) game.getLevel()).getEntityAt(new Rectangle(getMiddleX(), getMiddleY() + REACH));
+			case 'l' -> entity = ((Level) game.getLevel()).getEntityAt(new Rectangle(getMiddleX() - REACH, getMiddleY()));
+			case 'r' -> entity = ((Level) game.getLevel()).getEntityAt(new Rectangle(getMiddleX() + REACH, getMiddleY()));
 		}
 		
 		//if no entity, search for tile
 		if (entity == null) {
 			switch (lastDir) {
-				case 'u' -> entity = ((Level) game.getScreen()).getTileAt((int)getMiddleX(), getMiddleY() - REACH/2);
-				case 'd' -> entity = ((Level) game.getScreen()).getTileAt((int)getMiddleX(), getMiddleY() + REACH);
-				case 'l' -> entity = ((Level) game.getScreen()).getTileAt((int)getMiddleX() - REACH, getMiddleY());
-				case 'r' -> entity = ((Level) game.getScreen()).getTileAt((int)getMiddleX() + REACH, getMiddleY());
+				case 'u' -> entity = ((Level) game.getLevel()).getTileAt((int)getMiddleX(), getMiddleY() - REACH/2);
+				case 'd' -> entity = ((Level) game.getLevel()).getTileAt((int)getMiddleX(), getMiddleY() + REACH);
+				case 'l' -> entity = ((Level) game.getLevel()).getTileAt((int)getMiddleX() - REACH, getMiddleY());
+				case 'r' -> entity = ((Level) game.getLevel()).getTileAt((int)getMiddleX() + REACH, getMiddleY());
 			}
 		}
 		return entity;
 	}
 	
 	private void handleTileEvent() {
-		if (game.getScreen() instanceof Level) {
-			((Level) game.getScreen()).getTileAt(x + getMiddleX(), y + midRectY).event(game);
+		if (game.getLevel() instanceof Level) {
+			((Level) game.getLevel()).getTileAt(x + getMiddleX(), y + midRectY).event(game);
 		}
 	}
 	
 	private void isGameOver() {
 		if (hp <= 0) {
-			game.getScreen().removePlayer();
-			game.setScreen(game.titleMenu);
-			resetStats();
+			game.getLevel().removePlayer();
+			game.setMenu(game.titleMenu);
+			reset();
 		}
 	}
 	
-	private void resetStats() {
+	public void reset() {
 		hp = maxHp;
 		x = SPAWN_X*SPRITE_SIZE;
 		y = SPAWN_Y*SPRITE_SIZE;
@@ -337,8 +334,8 @@ public class Player extends Mob {
 	}
 		
 	private void handleEntityCollision() {
-		if (game.getScreen() instanceof Level) {
-			Entity entity = ((Level) game.getScreen()).getEntityAt(new Rectangle(x + rect.x, y + rect.y, rect.width, rect.height));
+		if (game.getLevel() instanceof Level) {
+			Entity entity = ((Level) game.getLevel()).getEntityAt(new Rectangle(x + rect.x, y + rect.y, rect.width, rect.height));
 			if (entity != null) {
 				entity.event(game);
 			}
@@ -399,19 +396,19 @@ public class Player extends Mob {
 
 	public void placeTile(Tile tile) {
 		switch (lastDir) {
-			case 'u' -> ((Level) game.getScreen()).addTile(5, getMiddleX(), y + midRectY - BUILD_REACH);
-			case 'd' -> ((Level) game.getScreen()).addTile(5, getMiddleX(), y + midRectY + BUILD_REACH);
-			case 'l' -> ((Level) game.getScreen()).addTile(5, getMiddleX() - BUILD_REACH, y + midRectY);
-			case 'r' -> ((Level) game.getScreen()).addTile(5, getMiddleX() + BUILD_REACH, y + midRectY);
+			case 'u' -> ((Level) game.getLevel()).addTile(5, getMiddleX(), y + midRectY - BUILD_REACH);
+			case 'd' -> ((Level) game.getLevel()).addTile(5, getMiddleX(), y + midRectY + BUILD_REACH);
+			case 'l' -> ((Level) game.getLevel()).addTile(5, getMiddleX() - BUILD_REACH, y + midRectY);
+			case 'r' -> ((Level) game.getLevel()).addTile(5, getMiddleX() + BUILD_REACH, y + midRectY);
 		}
 	}
 	
 	public void removeTile() {
 		switch (lastDir) {
-			case 'u' -> ((Level) game.getScreen()).removeTile(getMiddleX(), y + midRectY - BUILD_REACH);
-			case 'd' -> ((Level) game.getScreen()).removeTile(getMiddleX(), y + midRectY + BUILD_REACH);
-			case 'l' -> ((Level) game.getScreen()).removeTile(getMiddleX() - BUILD_REACH, y + midRectY);
-			case 'r' -> ((Level) game.getScreen()).removeTile(getMiddleX() + BUILD_REACH, y + midRectY);
+			case 'u' -> ((Level) game.getLevel()).removeTile(getMiddleX(), y + midRectY - BUILD_REACH);
+			case 'd' -> ((Level) game.getLevel()).removeTile(getMiddleX(), y + midRectY + BUILD_REACH);
+			case 'l' -> ((Level) game.getLevel()).removeTile(getMiddleX() - BUILD_REACH, y + midRectY);
+			case 'r' -> ((Level) game.getLevel()).removeTile(getMiddleX() + BUILD_REACH, y + midRectY);
 		}
 	}
 

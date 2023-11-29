@@ -18,7 +18,7 @@ public class Ghost extends Mob {
 	public Ghost(Game game) {
 		super(game);
 		image = SpriteSheet.getSpriteImage(11*16, 4*16, 16, 16);
-		map = game.levelScreen.getMap();
+		map = game.getLevel().getMap();
 		hp = 10;
 	
 		spawn();
@@ -28,7 +28,7 @@ public class Ghost extends Mob {
 	public void tick() {
 		super.tick();
 		
-		int xd = game.getScreen().player.x - x;
+		int xd = game.getPlayer().x - x;
 		int yd = game.getPlayer().y - y;
 		if (xd * xd + yd * yd < 100 * 100) {
 			if (yd < 0) y--;
@@ -54,7 +54,7 @@ public class Ghost extends Mob {
 		do {
 			x = random.nextInt(map.pw);
 			y = random.nextInt(map.ph);
-			xd = game.getScreen().player.x - x;
+			xd = game.getPlayer().x - x;
 			yd = game.getPlayer().y - y;
 		} while (isCollision() || xd * xd + yd * yd < 100 * 100);
 		
@@ -75,7 +75,7 @@ public class Ghost extends Mob {
 	protected void isDead() {
 		super.isDead();
 		if (hp <= 0) {
-			game.levelScreen.addEntity(new ItemEntity(new Ammo(),new Ammo().img, x, y));
+			game.getLevel().addEntity(new ItemEntity(new Ammo(),new Ammo().img, x, y));
 		}
 	}
 }

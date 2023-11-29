@@ -30,6 +30,10 @@ public class Display {
 		font = new Font();
 	}
 	
+	public void fillColor(int argb) {
+		Arrays.fill(pixels, argb);
+	}
+	
 	public void clear() {
 		Arrays.fill(pixels, 0xFF000000);
 	}

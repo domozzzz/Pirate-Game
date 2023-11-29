@@ -6,9 +6,9 @@ import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 
 import main.Game;
+import main.Level;
 import main.entity.Entity;
 import main.gfx.Display;
-import main.screen.level.Level;
 
 public class Particle extends Entity{
 	
@@ -91,7 +91,7 @@ public class Particle extends Entity{
 	
 		
 		if (0 >= --ticks)  {
-			game.levelScreen.removeEntity(this);
+			game.getLevel().removeEntity(this);
 		}	
 	}
 	

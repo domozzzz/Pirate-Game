@@ -6,36 +6,38 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
 import main.entity.mob.Player;
 import main.gfx.Display;
-import main.screen.menu.PauseMenu;
-import main.screen.menu.TitleMenu;
-import main.screen.Screen;
-import main.screen.level.Level;
+import main.menu.GameOverMenu;
+import main.menu.Menu;
+import main.menu.PauseMenu;
+import main.menu.TitleMenu;
 
 public class Game extends Canvas implements Runnable {
 
 	private static final long serialVersionUID = 1L;
 
-	public Screen titleMenu, levelScreen, characterMenu;
+	public Menu menu, characterMenu;
+
+	public Menu titleMenu;
+	private Level level;
 	public static boolean paused;
 
 	private final String TITLE = "Pirates";
 	public static final int SCREEN_HEIGHT = 256;
 	public static final int SCREEN_WIDTH = 256;
-	public static final int FPS = 60;
+	public static final int FPS = 30;
 
 	private int levelNum = 0;
 	private int prevLevel = 1;
 	private boolean running;
 	private int[] pixels;
-	private ArrayList<Level> levels = new ArrayList<Level>();
-	private Screen screen;
-	public PauseMenu pauseMenu;
+	private Level[] levels;
+	public Menu pauseMenu;
+	public GameOverMenu gameOverMenu;
 	private Display display;
 	private Input input;
 	private BufferedImage displayImage;
@@ -53,11 +55,10 @@ public class Game extends Canvas implements Runnable {
 		audio = new Audio();
 		player = new Player(this);
 
-		loadScreens();
+		loadMenus();
 		loadLevels();
-
-		levelScreen = levels.get(levelNum);
-		setScreen(titleMenu);
+		setMenu(titleMenu);
+		setLevel(levels[levelNum]);
 	}
 
 	public void start() {
@@ -89,10 +90,10 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	private void tick() {
-		if (paused) {
-			pauseMenu.tick();
-		} else {
-			screen.tick();
+		if (menu != null) {
+			menu.tick();
+		} else  {
+			level.tick();
 		}
 	}
 
@@ -106,10 +107,11 @@ public class Game extends Canvas implements Runnable {
 
 		Graphics g = displayImage.getGraphics();
 		display.clear();
-		screen.render(display);
-
-		if (paused) {
-			pauseMenu.render(display);
+		
+		if (menu != null) {
+			menu.render(display);
+		} else {
+			level.render(display);
 		}
 
 		// switch pixels
@@ -123,15 +125,17 @@ public class Game extends Canvas implements Runnable {
 		bs.show();
 	}
 
-	private void loadScreens() {
+	private void loadMenus() {
 		titleMenu = new TitleMenu(this, input);
 		//characterMenu = new CharacterMenu(this, input, player);
 		pauseMenu = new PauseMenu(this, input);
+		gameOverMenu = new GameOverMenu(this, input);
 	}
 
 	private void loadLevels() {
+		levels = new Level[Level.maps.length];
 		for (int i = 0; i < Level.maps.length; i++) {
-			levels.add(new Level(this, i));
+			levels[i] = new Level(this, i);
 		}
 	}
 
@@ -139,35 +143,31 @@ public class Game extends Canvas implements Runnable {
 		return display;
 	}
 
-	public void setScreen(Screen screen) {
-		this.screen = screen;
-		if (Level.class.isInstance(screen)) {
-			player.setMap(screen.map);
-			screen.addPlayer(player);
-			((Level) screen).loadEntities();
-		} else if (TitleMenu.class.isInstance(screen)) {
-			titleMenu.addPlayer(player);
-		}
-
-		else {
-			screen.removePlayer();
-		}
+	public void setLevel(Level level) {
+		this.level = level;
+		player.setMap(level.getMap());
+		level.addPlayer(player);
+		level.loadEntities();
 	}
-
-	public void changeLevel(int newLevelNum) {
-		prevLevel = levelNum;
-		levelNum = newLevelNum;
-		levelScreen = levels.get(levelNum);
-		setScreen(levelScreen);
-		player.setMap(screen.getMap());
+	
+	public void setMenu(Menu menu) {
+		this.menu = menu;
+	}
+	
+	public void reset() {
+		setMenu(null);
+		player.reset();
+		levelNum = 0;
+		loadLevels();
+		setLevel(levels[levelNum]);
 	}
 
 	public Player getPlayer() {
 		return player;
 	}
-
-	public Screen getScreen() {
-		return screen;
+	
+	public Menu getMenu() {
+		return menu;
 	}
 
 	public int getLevelNum() {
@@ -185,6 +185,21 @@ public class Game extends Canvas implements Runnable {
 	public Audio getAudio() {
 		return audio;
 	}
+	
+	public void nextLevel() {
+		if (levels.length - 1 >= ++levelNum) {
+			level = levels[levelNum];
+			setLevel(level);
+			player.x = 1 * 16;
+			player.y = 1 * 16;	
+			display.xScroll = 0;
+			display.yScroll = 0;
+			player.setMap(level.getMap());
+		} else {
+			setMenu(gameOverMenu);
+			gameOverMenu.setCoolDown(20);
+		}
+	}
 
 	public static void main(String[] args) {
 		Game game = new Game();
@@ -195,10 +210,16 @@ public class Game extends Canvas implements Runnable {
 		frame.setTitle(game.TITLE);
 		frame.pack();
 		frame.setResizable(false);
+		frame.setFocusable(true);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 
 		game.start();
+	
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+	}
+
+	public Level getLevel() {
+		return level;
 	}
 }

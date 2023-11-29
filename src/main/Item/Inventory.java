@@ -177,7 +177,7 @@ public class Inventory {
 			case 'l' -> xDist -= player.REACH;
 			case 'r' -> xDist += player.REACH;
 		}
-		game.getScreen().addEntity(new ItemEntity(getCurrentItem(), getCurrentItem().img, player.x + xDist, player.y + yDist));
+		game.getLevel().addEntity(new ItemEntity(getCurrentItem(), getCurrentItem().img, player.x + xDist, player.y + yDist));
 	}
 	
 	public void removeItem(Class<?> className) {

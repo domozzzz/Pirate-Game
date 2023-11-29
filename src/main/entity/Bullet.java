@@ -5,12 +5,12 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import main.Game;
+import main.Level;
 import main.entity.mob.Mob;
 import main.entity.tile.Tile;
 import main.gfx.Display;
 import main.gfx.SpriteSheet;
 import main.gfx.particle.Particle;
-import main.screen.level.Level;
 
 public class Bullet extends Entity {
 	
@@ -61,19 +61,19 @@ public class Bullet extends Entity {
 	}
 	
 	private void handleEntityCollision() {
-		if (game.getScreen() instanceof Level) {
-			Entity entity = ((Level) game.getScreen()).getEntityAt(new Rectangle(x + rect.x , y + rect.y, rect.width, rect.height));
+		if (game.getLevel() instanceof Level) {
+			Entity entity = ((Level) game.getLevel()).getEntityAt(new Rectangle(x + rect.x , y + rect.y, rect.width, rect.height));
 			if (entity != null && entity instanceof Mob) {
 				((Mob) entity).damage(100);
-				game.getScreen().removeEntity(this);
-				game.levelScreen.addEntity(new Particle(game, Color.RED, 5, 1, 1, x + rect.x + (int)rect.getWidth()/2, y + rect.y + (int)rect.getHeight()/2));
+				game.getLevel().removeEntity(this);
+				game.getLevel().addEntity(new Particle(game, Color.RED, 5, 1, 1, x + rect.x + (int)rect.getWidth()/2, y + rect.y + (int)rect.getHeight()/2));
 			}
 		}
 		
-		Tile tile = game.levelScreen.getTileAt((int)(x + rect.getX() + rect.getWidth()/2), (int)(y + rect.getY() + rect.getHeight()/2));
+		Tile tile = game.getLevel().getTileAt((int)(x + rect.getX() + rect.getWidth()/2), (int)(y + rect.getY() + rect.getHeight()/2));
 		if (tile != null && tile.collision) {
-			game.getScreen().removeEntity(this);
-			game.levelScreen.addEntity(new Particle(game, Color.BLACK, 5, 1, 1, x + rect.x + (int)rect.getWidth()/2, y + rect.y + (int)rect.getHeight()/2));
+			game.getLevel().removeEntity(this);
+			game.getLevel().addEntity(new Particle(game, Color.BLACK, 5, 1, 1, x + rect.x + (int)rect.getWidth()/2, y + rect.y + (int)rect.getHeight()/2));
 		}
 	}
 	

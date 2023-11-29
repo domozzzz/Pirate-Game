@@ -37,7 +37,7 @@ public class ItemEntity extends Entity {
 	public void event(Game game) {
 		if (!cooldown) {
 			game.getPlayer().getInv().addItem(item);
-			game.getScreen().removeEntity(this);
+			game.getLevel().removeEntity(this);
 			game.getAudio().playAudio(PICKUP_SOUND);
 			setCooldown(80);
 		}

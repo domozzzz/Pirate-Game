@@ -30,6 +30,6 @@ public class Shovel extends Item {
 
 	@Override
 	public void use() {
-		game.levelScreen.player.removeTile();
+		player.removeTile();
 	}
 }
