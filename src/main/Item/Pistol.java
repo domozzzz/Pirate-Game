@@ -1,37 +1,29 @@
 package main.Item;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-
-import main.Game;
+import main.Level;
+import main.Sound;
 import main.entity.Bullet;
-import main.gfx.Display;
+import main.entity.mob.Player;
 import main.gfx.SpriteSheet;
 
 public class Pistol extends Item {
 	
-	private Game game;
-	private BufferedImage bulletImage;	
-	private final String FIRE_SOUND = "/res/sounds/roblox/snap.wav";
 	
-	public Pistol(Game game) {
+	public Pistol(Level level) {
 		
-		this.game = game;
+		this.level = level;
 		
-		icon = SpriteSheet.getSpriteImage(0*16, 12*8, 16, 16);
-		img = SpriteSheet.getSpriteImage(1*16, 12*8, 16, 16);		 
+		image = SpriteSheet.getSpriteImage(1*16, 12*8, 16, 16);		 
 	}
-	
+
 	@Override
-	public void use() {
-		if (!cooldown && game.getPlayer().getInv().contains(Ammo.class)) {
+	public void use(Player player) {
+		if (!cooldown && player.getInventory().contains(Ammo.class)) {
 			
-			game.getLevel().addEntity(new Bullet(game, game.getPlayer().x,
-					game.getPlayer().y,
-					game.getPlayer().getXDir(), game.getPlayer().getYDir()));
+			level.addEntity(new Bullet(level, player.x, player.y, player.getXDir(), player.getYDir()));
+			player.getInventory().removeItem(Ammo.class);
 			
-			game.getPlayer().getInv().removeItem(Ammo.class);
-			game.getAudio().playAudio(FIRE_SOUND);
+			Sound.shoot.play();
 			setCooldown(20);
 		}
 	}

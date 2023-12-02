@@ -8,6 +8,7 @@ import main.gfx.Display;
 
 public class Entity {
 	
+	public static final int TILE_SIZE = 16;
 	public int x, y, w, h;
 	public boolean collision;
 	public boolean cooldown;
@@ -16,6 +17,7 @@ public class Entity {
 	protected int tickCount;
 	protected BufferedImage image;
 	public Rectangle rect;
+	protected int flip = 0;
 
 	public Entity(BufferedImage image, int x, int y) {
 		this.image = image;

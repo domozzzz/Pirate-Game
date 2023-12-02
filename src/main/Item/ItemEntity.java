@@ -4,12 +4,12 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import main.Game;
+import main.Sound;
 import main.entity.Entity;
 
 public class ItemEntity extends Entity {
 	
 	private Item item;
-	private final String PICKUP_SOUND = "/res/sounds/roblox/bass.wav";
 	
 	public ItemEntity(Item item, BufferedImage image, int x, int y) {
 		this.item = item;
@@ -36,9 +36,9 @@ public class ItemEntity extends Entity {
 	@Override
 	public void event(Game game) {
 		if (!cooldown) {
-			game.getPlayer().getInv().addItem(item);
+			game.getPlayer().getInventory().add(item);
 			game.getLevel().removeEntity(this);
-			game.getAudio().playAudio(PICKUP_SOUND);
+			Sound.pickUp.play();
 			setCooldown(80);
 		}
 	}

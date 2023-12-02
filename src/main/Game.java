@@ -42,7 +42,7 @@ public class Game extends Canvas implements Runnable {
 	private Input input;
 	private BufferedImage displayImage;
 	private Player player;
-	private Audio audio;
+	private Sound audio;
 
 	public Game() {
 		setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
@@ -51,8 +51,8 @@ public class Game extends Canvas implements Runnable {
 		pixels = ((DataBufferInt) displayImage.getRaster().getDataBuffer()).getData();
 
 		display = new Display();
-		input = new Input(this);
-		audio = new Audio();
+		input = new Input();
+		addKeyListener(input);
 		player = new Player(this);
 
 		loadMenus();
@@ -135,7 +135,7 @@ public class Game extends Canvas implements Runnable {
 	private void loadLevels() {
 		levels = new Level[Level.maps.length];
 		for (int i = 0; i < Level.maps.length; i++) {
-			levels[i] = new Level(this, i);
+			levels[i] = new Level(i);
 		}
 	}
 
@@ -146,6 +146,7 @@ public class Game extends Canvas implements Runnable {
 	public void setLevel(Level level) {
 		this.level = level;
 		player.setMap(level.getMap());
+		player.init(level);
 		level.addPlayer(player);
 		level.loadEntities();
 	}
@@ -182,7 +183,7 @@ public class Game extends Canvas implements Runnable {
 		return input;
 	}
 	
-	public Audio getAudio() {
+	public Sound getAudio() {
 		return audio;
 	}
 	

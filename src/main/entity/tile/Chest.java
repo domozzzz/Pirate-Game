@@ -1,10 +1,9 @@
 package main.entity.tile;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import main.Game;
-import main.Item.FishingRod;
+import main.Level;
 import main.Item.Food;
 import main.gfx.SpriteSheet;
 
@@ -12,14 +11,13 @@ public class Chest extends Tile {
 	
 	private boolean opened;
 	private BufferedImage openedImg;
+	private Level level;
 	
-	public Chest(Game game) {
+	public Chest(Level level) {
 		super(SpriteSheet.getSpriteImage(1*TILE_SIZE, 1*TILE_SIZE, TILE_SIZE, TILE_SIZE));
 		openedImg = SpriteSheet.getSpriteImage(2*TILE_SIZE, 1*TILE_SIZE, TILE_SIZE, TILE_SIZE);
 		
-		main = Color.YELLOW;
-		trim = Color.GRAY;
-		
+		this.level = level;
 		collision = true;
 		breakable = false;
 	}
@@ -33,9 +31,9 @@ public class Chest extends Tile {
 	@Override
 	public void event(Game game) {
 		if (!opened) {
-			game.getPlayer().getInv().addItem(new Food(game.getPlayer()));
-			game.getPlayer().getInv().addItem(new Food(game.getPlayer()));
-			game.getPlayer().getInv().addItem(new Food(game.getPlayer()));
+			level.getPlayer().getInventory().add(new Food());
+			level.getPlayer().getInventory().add(new Food());
+			level.getPlayer().getInventory().add(new Food());
 			opened = true;
 		}	
 	}

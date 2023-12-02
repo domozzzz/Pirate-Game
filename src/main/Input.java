@@ -7,10 +7,6 @@ public class Input implements KeyListener {
 	
 	public boolean up, down, left, right, enter, back, dispose, inv;
 	public int num = 0;
-	
-	public Input(Game game) {
-		game.addKeyListener(this);
-	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {}

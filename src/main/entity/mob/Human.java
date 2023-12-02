@@ -1,36 +1,37 @@
 package main.entity.mob;
 
-import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.Random;
 
-import main.Game;
+import main.Sound;
+import main.Level;
 import main.Item.Ammo;
 import main.Item.ItemEntity;
-import main.ai.Node;
 import main.ai.PathFinder;
 import main.entity.Map;
 import main.gfx.Display;
 import main.gfx.SpriteSheet;
 
-
+	
 public class Human extends Mob {
 
 	private Map map;
-	private Random random = new Random();
-	boolean onPath;
-	PathFinder pathFinder;
-	char dir;
+	private PathFinder pathFinder;
+	private Random random;
 	
-	public Human(Game game) {
-		super(game);
-		pathFinder = new PathFinder(game);
+	private int knockBack = 20;
+	
+	public Human(Level level) {
+		this.level = level;
+		
+		map = level.getMap();
+		pathFinder = new PathFinder(level);
+		random = new Random();
+
+		hp = 10;
+		
 		loadImages();
 		image = frontWalk;
-		map = game.getLevel().getMap();
-		hp = 10;
 		spawn();
-		onPath = true;
 	}
 	
 	@Override
@@ -43,10 +44,10 @@ public class Human extends Mob {
 		int startCol = x/16;
 		int startRow = y/16;
 		
-		Player player = game.getPlayer();
+		Player player = level.getPlayer();
 		
-		int goalCol = player.getMiddleX()/16;
-		int goalRow = player.getMiddleY()/16;
+		int goalCol = player.getCenterX()/16;
+		int goalRow = player.getCenterY()/16;
 		
 		pathFinder.setNodes(startCol, startRow, goalCol, goalRow, this);
 		
@@ -56,23 +57,9 @@ public class Human extends Mob {
 			int yd = pathFinder.pathList.get(0).row * 16 - y;
 			
 			if (yd < 0) y--;
-			if (yd > 0) y++;
-			if (xd < 0) x--;
-			if (xd > 0) x++;
-		}
-		
-		int xd = game.getPlayer().x - x;
-		int yd = game.getPlayer().y - y;
-		
-		if (xd * xd + yd * yd < 15 * 15) {
-			onPath = false;
-			xd = player.x - x;
-			yd = player.x - y;
-			
-			if (yd < 0) y--;
-			if (yd > 0) y++;
-			if (xd < 0) x--;
-			if (xd > 0) x++;
+			else if (yd > 0) y++;
+			else if (xd < 0) x--;	
+			else if (xd > 0) x++;
 		}
 	}
 	
@@ -120,8 +107,8 @@ public class Human extends Mob {
 		do {
 			x = random.nextInt(map.pw);
 			y = random.nextInt(map.ph);
-			xd = game.getPlayer().x - x;
-			yd = game.getPlayer().y - y;
+			xd = level.getPlayer().x - x;
+			yd = level.getPlayer().y - y;
 		} while (isCollision() || xd * xd + yd * yd < 100 * 100);
 		
 		if (x % 4 == 0) lastDir = 'u';
@@ -130,9 +117,11 @@ public class Human extends Mob {
 		if (x % 4 == 3) lastDir = 'r';
 	}
 	
-	public void event(Game game) {
+	public void event() {
 		if (!cooldown) {
-			game.getPlayer().damage(1);
+			level.getPlayer().damage(1);
+			level.getPlayer().knock(knockBack);
+			Sound.hit.play();
 			setCooldown(20);
 		}
 	}
@@ -141,7 +130,7 @@ public class Human extends Mob {
 	protected void isDead() {
 		super.isDead();
 		if (hp <= 0) {
-			game.getLevel().addEntity(new ItemEntity(new Ammo(),new Ammo().img, x, y));
+			level.addEntity(new ItemEntity(new Ammo(),new Ammo().getImage(), x, y));
 		}
 	}
 	

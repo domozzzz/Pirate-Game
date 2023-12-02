@@ -2,7 +2,6 @@ package main.entity;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 
 import main.Game;
 import main.Level;
@@ -14,25 +13,21 @@ import main.gfx.particle.Particle;
 
 public class Bullet extends Entity {
 	
-	private Game game;
-	BufferedImage bulletImage;
+	private Level level;
 	public int bulletPos = 0;
 	public int range = 24;
-	private int x, y;
 	private char xDir, yDir;
 	
-	public Bullet(Game game, int x, int  y, char xDir, char yDir) {
+	public Bullet(Level level, int x, int  y, char xDir, char yDir) {
 		
-		this.game = game;
+		this.level = level;
 		this.x = x;
 		this.y = y;
 		this.xDir = xDir;
 		this.yDir = yDir;
 		
-		 //icon = SpriteSheet.getSpriteImage(0*16, 12*8, 16, 16);
-		 bulletImage = SpriteSheet.getSpriteImage(2*16, 12*8, 16, 16);
-		 
-		 image = bulletImage;
+		image = SpriteSheet.getSpriteImage(2*16, 12*8, 16, 16);
+
 		 createHitbox();
 	}
 	
@@ -60,26 +55,26 @@ public class Bullet extends Entity {
 		handleEntityCollision();
 	}
 	
-	private void handleEntityCollision() {
-		if (game.getLevel() instanceof Level) {
-			Entity entity = ((Level) game.getLevel()).getEntityAt(new Rectangle(x + rect.x , y + rect.y, rect.width, rect.height));
-			if (entity != null && entity instanceof Mob) {
-				((Mob) entity).damage(100);
-				game.getLevel().removeEntity(this);
-				game.getLevel().addEntity(new Particle(game, Color.RED, 5, 1, 1, x + rect.x + (int)rect.getWidth()/2, y + rect.y + (int)rect.getHeight()/2));
-			}
-		}
-		
-		Tile tile = game.getLevel().getTileAt((int)(x + rect.getX() + rect.getWidth()/2), (int)(y + rect.getY() + rect.getHeight()/2));
-		if (tile != null && tile.collision) {
-			game.getLevel().removeEntity(this);
-			game.getLevel().addEntity(new Particle(game, Color.BLACK, 5, 1, 1, x + rect.x + (int)rect.getWidth()/2, y + rect.y + (int)rect.getHeight()/2));
-		}
-	}
-	
 	@Override
 	public void render(Display display) {
 		//draw bullets
 		display.render(image, x, y, 0);
+	}
+	
+	private void handleEntityCollision() {
+		if (level instanceof Level) {
+			Entity entity = (level).getEntityAt(new Rectangle(x + rect.x , y + rect.y, rect.width, rect.height));
+			if (entity != null && entity instanceof Mob) {
+				((Mob) entity).damage(100);
+				level.removeEntity(this);
+				level.addEntity(new Particle(level, Color.RED, 5, x + rect.x + rect.width/2, y + rect.y + rect.width/2));
+			}
+		}
+		
+		Tile tile = level.getTileAt((int)(x + rect.x + rect.width/2), (y + rect.y + rect.height/2));
+		if (tile != null && tile.collision) {
+			level.removeEntity(this);
+			level.addEntity(new Particle(level, Color.BLACK, 5, x + rect.x + rect.width/2, y + rect.y + rect.height/2));
+		}
 	}
 }

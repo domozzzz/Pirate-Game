@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import main.Game;
+import main.Level;
 import main.entity.Entity;
+import main.entity.mob.Player;
 import main.gfx.Display;
 
 public abstract class Item extends Entity {
@@ -15,13 +17,12 @@ public abstract class Item extends Entity {
 	protected int tickCount;
 	protected int cooldownEnd;
 	public int slot = 0;
-	
-	public BufferedImage img;
+	protected Level level;
 
 	protected BufferedImage icon;
 	public boolean shooting;
 	
-	public abstract void use();
+	public void use(Player player) {}
 	
 	public void tick() {
 		tickCount++;
@@ -29,7 +30,7 @@ public abstract class Item extends Entity {
 	}
 	
 	public void render(Display display, int x, int y, int flip) {
-		display.render(img, x, y, 0);
+		display.render(image, x, y, 0);
 	}	
 	public void setCooldown(int ticks) {
 		cooldownEnd = tickCount + ticks;

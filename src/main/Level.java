@@ -2,7 +2,6 @@ package main;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Vector;
 
 import main.entity.Entity;
 import main.entity.Map;
@@ -14,6 +13,7 @@ import main.entity.tile.Chest;
 import main.entity.tile.Door;
 import main.entity.tile.Floor;
 import main.entity.tile.Tile;
+import main.entity.tile.Tree;
 import main.entity.tile.Wall;
 import main.entity.tile.Water;
 import main.gfx.Display;
@@ -23,7 +23,9 @@ public class Level {
 	
 	public static final String[] maps = {"/res/maps/map00.txt" , "/res/maps/map01.txt", "/res/maps/map02.txt"};
 	public static final int[][] spawns = {{1,1}, {12,1}, {12, 1}};
-	private int mobCount = 5;
+	private int humans = 1;
+	private int ghosts = 0;
+
 	protected ArrayList<Entity> entities = new ArrayList<>();
 	public Tile[] tiles = new Tile[9999];
 	public static final int TILE_SIZE = 16;
@@ -31,11 +33,9 @@ public class Level {
 	protected final int CAMERA_TILE_HEIGHT = 16;
 	private Map map;
 	private Player player;
-	private Game game;
 	
-	public Level(Game game, int mapNum) {
+	public Level(int mapNum) {
 		map = IO.loadMap(maps[mapNum]);
-		this.game = game;
 		loadTiles();
 	}
 
@@ -62,7 +62,7 @@ public class Level {
 			for (int y = 0; y < map.rows; y++) {
 				Tile tile = tiles[map.tileMap[x + y*map.cols]];
 				if (x - display.xScroll <= CAMERA_TILE_WIDTH && y - display.yScroll <= CAMERA_TILE_HEIGHT) {
-					tile.render(display, x, y, 0);
+					tile.render(display, x, y);
 				}
 			}
 		}
@@ -88,18 +88,19 @@ public class Level {
 	private void loadTiles() {
 		tiles[0] = new Floor();
 		tiles[1] = new Wall();
+		tiles[2] = new Tree();
 		tiles[3] = new Door();
-		tiles[4] = new Chest(game);
+		tiles[4] = new Chest(this);
 		tiles[5] = new Water();
 	}
 	
 	public void loadEntities() {
-		for (int i = 0; i < mobCount; i++) {
-			if (i % 2 == 0) {
-				entities.add(new Human(game));
-			} else {
-				entities.add(new Ghost(game));
+		for (int i = 0; i < humans; i++) {
+				entities.add(new Human(this));
 			}
+		
+		for (int i = 0; i < humans; i++) {
+			entities.add(new Ghost(this));
 		}
 	}
 
@@ -152,6 +153,7 @@ public class Level {
 	
 	public void addPlayer(Player player) {
 		this.player = player;
+		player.setLevel(this);
 	}
 	
 	public void removePlayer() {
@@ -164,5 +166,9 @@ public class Level {
 
 	public Map getMap() {
 		return map;
+	}
+
+	public Player getPlayer() {
+		return player;
 	}
 }

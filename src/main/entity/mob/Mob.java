@@ -5,13 +5,14 @@ import java.awt.image.BufferedImage;
 
 import main.Game;
 import main.Level;
+import main.Sound;
 import main.entity.Entity;
 import main.gfx.Display;
 import main.gfx.SpriteSheet;
 
 public abstract class Mob extends Entity {
 	
-	protected Game game;
+	protected Level level;
 	protected int speed;
 	protected int hp;
 	protected BufferedImage front, back, side, frontWalk, backWalk,
@@ -21,10 +22,7 @@ public abstract class Mob extends Entity {
 	protected int flip;
 	protected static final int SPRITE_SIZE = 16;
 	
-	private final String DEATH_SOUND = "/res/sounds/roblox/death.wav";
-	
-	public Mob(Game game) {
-		this.game = game;
+	public Mob() {
 		initHitbox();
 	}
 	
@@ -46,10 +44,10 @@ public abstract class Mob extends Entity {
 	}
 	
 	protected boolean isCollision() {
-		if ((game.getLevel()).getTileAt(x + getRect().x, y + getRect().y).isCollision() 
-				|| game.getLevel().getTileAt(x + getRect().x + getRect().width, y + getRect().y + getRect().height).isCollision()
-				|| game.getLevel().getTileAt(x + getRect().x + getRect().width, y + getRect().y).isCollision() 
-				|| game.getLevel().getTileAt(x + getRect().x, y + getRect().y + getRect().height).isCollision()) {
+		if ((level).getTileAt(x + rect.x, y + rect.y).isCollision()
+				|| level.getTileAt(x + rect.x + rect.width, y + rect.y + rect.height).isCollision()
+				|| level.getTileAt(x + rect.x + rect.width, y + rect.y).isCollision() 
+				|| level.getTileAt(x + rect.x, y + rect.y + rect.height).isCollision()) {
 			return true;
 		}
 		return false;
@@ -73,18 +71,18 @@ public abstract class Mob extends Entity {
 		this.hp += hp;
 	}
 	
-	public int getMiddleX() {
+	public int getCenterX() {
 		return x + rect.x + (int)rect.getWidth()/2;
 	}
 
-	public int getMiddleY() {
+	public int getCenterY() {
 		return y + rect.y + (int)rect.getHeight()/2;
 	}
 	
 	protected void isDead() {
 		if (hp <= 0) {
-			game.getAudio().playAudio(DEATH_SOUND);
-			game.getLevel().removeMob(this);
+			Sound.death.play();
+			level.removeMob(this);
 		}
 	}
 }
