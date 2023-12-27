@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import main.Game;
+import main.Level;
 import main.Sound;
 import main.entity.Entity;
 
@@ -34,10 +35,10 @@ public class ItemEntity extends Entity {
 	}
 	
 	@Override
-	public void event(Game game) {
+	public void event(Level level) {
 		if (!cooldown) {
-			game.getPlayer().getInventory().add(item);
-			game.getLevel().removeEntity(this);
+			level.getPlayer().getInventory().add(item);
+			level.removeEntity(this);
 			Sound.pickUp.play();
 			setCooldown(80);
 		}

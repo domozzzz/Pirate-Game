@@ -4,11 +4,13 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import main.Game;
+import main.Level;
 import main.gfx.Display;
 
 public class Entity {
 	
 	public static final int TILE_SIZE = 16;
+	public static final int HALF_TILE_SIZE = 8;
 	public int x, y, w, h;
 	public boolean collision;
 	public boolean cooldown;
@@ -56,6 +58,13 @@ public class Entity {
 	
 	public void setImage(BufferedImage image) {this.image = image;}
 	
-	public void event(Game game) {
+	public void event(Level level) {}
+	
+	public int getCenterX() {
+		return x + rect.x + (int)rect.getWidth()/2;
+	}
+
+	public int getCenterY() {
+		return y + rect.y + (int)rect.getHeight()/2;
 	}
 }

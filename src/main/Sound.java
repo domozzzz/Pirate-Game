@@ -11,6 +11,8 @@ public class Sound {
 	public static final Sound open = new Sound("/res/sounds/roblox/button.wav");
 	public static final Sound shoot = new Sound("/res/sounds/roblox/snap.wav");
 	public static final Sound pickUp = new Sound("/res/sounds/roblox/bass.wav");
+	public static final Sound hurt = new Sound("/res/sounds/roblox/splat.wav");
+
 	
 	@SuppressWarnings("removal")
 	private AudioClip clip;

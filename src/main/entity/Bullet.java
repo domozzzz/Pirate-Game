@@ -3,8 +3,8 @@ package main.entity;
 import java.awt.Color;
 import java.awt.Rectangle;
 
-import main.Game;
 import main.Level;
+import main.Sound;
 import main.entity.mob.Mob;
 import main.entity.tile.Tile;
 import main.gfx.Display;
@@ -57,24 +57,24 @@ public class Bullet extends Entity {
 	
 	@Override
 	public void render(Display display) {
-		//draw bullets
 		display.render(image, x, y, 0);
 	}
 	
 	private void handleEntityCollision() {
-		if (level instanceof Level) {
-			Entity entity = (level).getEntityAt(new Rectangle(x + rect.x , y + rect.y, rect.width, rect.height));
-			if (entity != null && entity instanceof Mob) {
-				((Mob) entity).damage(100);
-				level.removeEntity(this);
-				level.addEntity(new Particle(level, Color.RED, 5, x + rect.x + rect.width/2, y + rect.y + rect.width/2));
-			}
+		Entity entity = level.getEntityAt(x + rect.x , y + rect.y, rect.width, rect.height);
+		
+		if (entity != null && entity instanceof Mob) {
+			((Mob) entity).damage(100);
+			level.removeEntity(this);
+			level.addEntity(new Particle(level, Color.RED, 5, getCenterX(), getCenterY()));
 		}
 		
-		Tile tile = level.getTileAt((int)(x + rect.x + rect.width/2), (y + rect.y + rect.height/2));
+		Tile tile = level.getTileAt(getCenterX(), getCenterY());
+		
 		if (tile != null && tile.collision) {
+			Sound.hit.play();
 			level.removeEntity(this);
-			level.addEntity(new Particle(level, Color.BLACK, 5, x + rect.x + rect.width/2, y + rect.y + rect.height/2));
+			level.addEntity(new Particle(level, Color.BLACK, 5, getCenterX(), getCenterY()));
 		}
 	}
 }

@@ -1,8 +1,10 @@
 package main.entity.mob;
 
+import java.awt.Rectangle;
 import java.util.Random;
 
 import main.Level;
+import main.Sound;
 import main.Item.Ammo;
 import main.Item.ItemEntity;
 import main.entity.Map;
@@ -20,7 +22,8 @@ public class Ghost extends Mob {
 		image = SpriteSheet.getSpriteImage(11*16, 4*16, 16, 16);
 		map = level.getMap();
 		hp = 10;
-	
+		
+		initHitbox();
 		spawn();
 	}
 	
@@ -64,11 +67,23 @@ public class Ghost extends Mob {
 		if (x % 4 == 3) lastDir = 'r';
 	}
 	
-	public void event() {
+	@Override
+	public void event(Level level) {
 		if (!cooldown) {
 			level.getPlayer().damage(1);
+			level.getPlayer().knock(20);
+			Sound.hurt.play();
 			setCooldown(20);
 		}
+	}
+	
+	@Override
+	protected void initHitbox() {
+		rect = (new Rectangle());
+		rect.x = 2;
+		rect.y = 2;	
+		rect.width = 11;
+		rect.height = 11;
 	}
 	
 	@Override

@@ -22,9 +22,8 @@ import main.io.IO;
 public class Level {
 	
 	public static final String[] maps = {"/res/maps/map00.txt" , "/res/maps/map01.txt", "/res/maps/map02.txt"};
-	public static final int[][] spawns = {{1,1}, {12,1}, {12, 1}};
-	private int humans = 1;
-	private int ghosts = 0;
+	private int humans = 0;
+	private int ghosts = 4;
 
 	protected ArrayList<Entity> entities = new ArrayList<>();
 	public Tile[] tiles = new Tile[9999];
@@ -99,18 +98,24 @@ public class Level {
 				entities.add(new Human(this));
 			}
 		
-		for (int i = 0; i < humans; i++) {
+		for (int i = 0; i < ghosts; i++) {
 			entities.add(new Ghost(this));
 		}
 	}
+	
+	public Entity getEntityAt(int w, int h) {
+		return getEntityAt(0, 0, w, h);
+	}
 
-	public Entity getEntityAt(Rectangle rect) {
-		for (Entity entity : entities) {
-			if (entity.rect != null) {
-				Rectangle eRec = new Rectangle(entity.x + entity.rect.x, entity.y + entity.rect.y,
-						entity.rect.width, entity.rect.height);
-				if (eRec.intersects(rect)) {
-						return entity;
+	public Entity getEntityAt(int x, int y, int w, int h) {
+		
+		Rectangle rect = new Rectangle(x, y, w, h);
+		
+		for (Entity e : entities) {
+			if (e.rect != null) {
+				Rectangle posRect = new Rectangle(e.x, e.y, e.rect.width, e.rect.height);
+				if (rect.intersects(posRect)) {
+					return e;
 				}
 			}
 		}
@@ -138,6 +143,7 @@ public class Level {
 	    int gridPos = x/CAMERA_TILE_WIDTH + y/CAMERA_TILE_HEIGHT*map.cols;
 		if (tiles[map.tileMap[gridPos]].isBreakable() && !isSameTile(tileNum, x, y)) {
 			map.tileMap[gridPos] = tileNum;
+			Sound.hit.play();
 		}
 	}
 	

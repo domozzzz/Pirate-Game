@@ -3,12 +3,10 @@ package main.entity.mob;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
-import main.Game;
 import main.Level;
 import main.Sound;
 import main.entity.Entity;
 import main.gfx.Display;
-import main.gfx.SpriteSheet;
 
 public abstract class Mob extends Entity {
 	
@@ -31,20 +29,14 @@ public abstract class Mob extends Entity {
 		display.render(image, x, y, flip);
 	}
 	
-	private void initHitbox() {
-		rect = (new Rectangle());
-		rect.x = 2;
-		rect.y = 8;	
-		rect.width = 11;
-		rect.height = 7;
-	}
+	protected abstract void initHitbox();
 	
 	public Rectangle getRect() {
 		return rect;
 	}
 	
 	protected boolean isCollision() {
-		if ((level).getTileAt(x + rect.x, y + rect.y).isCollision()
+		if (level.getTileAt(x + rect.x, y + rect.y).isCollision()
 				|| level.getTileAt(x + rect.x + rect.width, y + rect.y + rect.height).isCollision()
 				|| level.getTileAt(x + rect.x + rect.width, y + rect.y).isCollision() 
 				|| level.getTileAt(x + rect.x, y + rect.y + rect.height).isCollision()) {
@@ -69,14 +61,6 @@ public abstract class Mob extends Entity {
 	
 	public void heal(int hp) {
 		this.hp += hp;
-	}
-	
-	public int getCenterX() {
-		return x + rect.x + (int)rect.getWidth()/2;
-	}
-
-	public int getCenterY() {
-		return y + rect.y + (int)rect.getHeight()/2;
 	}
 	
 	protected void isDead() {

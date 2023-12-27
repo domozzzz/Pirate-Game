@@ -1,5 +1,6 @@
 package main.entity.mob;
 
+import java.awt.Rectangle;
 import java.util.Random;
 
 import main.Sound;
@@ -10,7 +11,6 @@ import main.ai.PathFinder;
 import main.entity.Map;
 import main.gfx.Display;
 import main.gfx.SpriteSheet;
-
 	
 public class Human extends Mob {
 
@@ -31,6 +31,8 @@ public class Human extends Mob {
 		
 		loadImages();
 		image = frontWalk;
+		
+		initHitbox();
 		spawn();
 	}
 	
@@ -117,13 +119,23 @@ public class Human extends Mob {
 		if (x % 4 == 3) lastDir = 'r';
 	}
 	
-	public void event() {
+	@Override
+	public void event(Level level) {
 		if (!cooldown) {
 			level.getPlayer().damage(1);
 			level.getPlayer().knock(knockBack);
 			Sound.hit.play();
 			setCooldown(20);
 		}
+	}
+	
+	@Override
+	protected void initHitbox() {
+		rect = (new Rectangle());
+		rect.x = 2;
+		rect.y = 2;	
+		rect.width = 11;
+		rect.height = 11;
 	}
 	
 	@Override

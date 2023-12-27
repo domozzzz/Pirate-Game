@@ -29,7 +29,7 @@ public class Game extends Canvas implements Runnable {
 	private final String TITLE = "Pirates";
 	public static final int SCREEN_HEIGHT = 256;
 	public static final int SCREEN_WIDTH = 256;
-	public static final int FPS = 30;
+	public static final int FPS = 40;
 
 	private int levelNum = 0;
 	private int prevLevel = 1;

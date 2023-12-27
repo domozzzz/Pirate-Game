@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import main.Game;
 import main.Input;
 import main.Level;
+import main.Sound;
 import main.Item.Ammo;
 import main.Item.Bait;
 import main.Item.FishingRod;
@@ -38,7 +39,6 @@ public class Player extends Mob {
 	private BufferedImage border;
 	
 	private Inventory inventory;
-	private Rectangle rect;
 	private Input input;
 	private Hat hat;
 	private Map map;
@@ -54,13 +54,16 @@ public class Player extends Mob {
 		input = game.getInput();
 		hud = new Hud(this);
 		
-		createHitbox();
 		reset();
 		loadImages();
+		
+		x = 1 * 16;
+		y = 1 * 16;
 		
 		screenCenterX = game.getDisplay().cameraWidth/2;
 		screenCenterY = game.getDisplay().cameraHeight/2;
 		
+		initHitbox();
 		hat = new DavysHat();
 		image = front;
 	}
@@ -142,20 +145,20 @@ public class Player extends Mob {
 			switch (lastDir) {
 			
 				case 'u': 
-					p = game.getLevel().getTileTopLeftX(getCenterX());
-					o = game.getLevel().getTileTopLeftX(getCenterY() - BUILD_REACH);
+					p = level.getTileTopLeftX(getCenterX());
+					o = level.getTileTopLeftX(getCenterY() - BUILD_REACH);
 					break;
 				case 'd':
-					p = game.getLevel().getTileTopLeftX(getCenterX());
-					o = game.getLevel().getTileTopLeftX(getCenterY() + BUILD_REACH);
+					p = level.getTileTopLeftX(getCenterX());
+					o = level.getTileTopLeftX(getCenterY() + BUILD_REACH);
 					break;
 				case 'l':
-					p = game.getLevel().getTileTopLeftX(getCenterX() - BUILD_REACH);
-					o = game.getLevel().getTileTopLeftX(getCenterY());
+					p = level.getTileTopLeftX(getCenterX() - BUILD_REACH);
+					o = level.getTileTopLeftX(getCenterY());
 					break;
 				case 'r':
-					p = game.getLevel().getTileTopLeftX(getCenterX() + BUILD_REACH);
-					o = game.getLevel().getTileTopLeftX(getCenterY());
+					p = level.getTileTopLeftX(getCenterX() + BUILD_REACH);
+					o = level.getTileTopLeftX(getCenterY());
 					break;
 
 			}
@@ -213,7 +216,7 @@ public class Player extends Mob {
 		
 		if (input.enter) {
 			if (getEntityInFront() != null) {
-				getEntityInFront().event(game);
+				getEntityInFront().event(level);
 			}
 		}
 		
@@ -309,33 +312,31 @@ public class Player extends Mob {
 		
 		// search for entity
 		switch (lastDir) {
-			case 'u' -> entity = ((Level) game.getLevel()).getEntityAt(new Rectangle(x, y - REACH));
-			case 'd' -> entity = ((Level) game.getLevel()).getEntityAt(new Rectangle(x, y + REACH));
-			case 'l' -> entity = ((Level) game.getLevel()).getEntityAt(new Rectangle(x - REACH, y));
-			case 'r' -> entity = ((Level) game.getLevel()).getEntityAt(new Rectangle(x + REACH, y));
+			case 'u' -> entity = level.getEntityAt(x, y - REACH);
+			case 'd' -> entity = level.getEntityAt(x, y + REACH);
+			case 'l' -> entity = level.getEntityAt(x - REACH, y);
+			case 'r' -> entity = level.getEntityAt(x + REACH, y);
 		}
 		
 		//if no entity, search for tile
 		if (entity == null) {
 			switch (lastDir) {
-				case 'u' -> entity = ((Level) game.getLevel()).getTileAt(x, y - REACH);
-				case 'd' -> entity = ((Level) game.getLevel()).getTileAt(x, y + REACH);
-				case 'l' -> entity = ((Level) game.getLevel()).getTileAt(x - REACH, y);
-				case 'r' -> entity = ((Level) game.getLevel()).getTileAt(x + REACH, y);
+				case 'u' -> entity = level.getTileAt(x, y - REACH);
+				case 'd' -> entity = level.getTileAt(x, y + REACH);
+				case 'l' -> entity = level.getTileAt(x - REACH, y);
+				case 'r' -> entity = level.getTileAt(x + REACH, y);
 			}
 		}
 		return entity;
 	}
 	
 	private void handleTileEvent() {
-		if (game.getLevel() instanceof Level) {
-			((Level) game.getLevel()).getTileAt(getCenterX(), getCenterY()).event(game);
-		}
+		level.getTileAt(getCenterX(), getCenterY()).event(game);
 	}
 	
 	private void isGameOver() {
 		if (hp <= 0) {
-			game.getLevel().removePlayer();
+			level.removePlayer();
 			game.setMenu(game.titleMenu);
 			reset();
 		}
@@ -350,32 +351,22 @@ public class Player extends Mob {
 	}
 		
 	private void handleEntityCollision() {
-		if (game.getLevel() instanceof Level) {
-			Entity entity = ((Level) game.getLevel()).getEntityAt(new Rectangle(x + rect.x, y + rect.y, rect.width, rect.height));
-			if (entity != null) {
-				entity.event(game);
-			}
+		Entity entity = level.getEntityAt(x + rect.x, y + rect.y, rect.width, rect.height);
+		if (entity != null) {
+			entity.event(level);
 		}
 	}
-	
-	private void createHitbox() {
-		rect = new Rectangle();
-		rect.x = 2;
-		rect.y = 6;	
-		rect.width = 11;
-		rect.height = 9;
-	}
-	
+
 	public void loadImages() {
 		//character
-		front = SpriteSheet.getSpriteImage(0, 6*8, SPRITE_SIZE, SPRITE_SIZE);
-		back = SpriteSheet.getSpriteImage(1*SPRITE_SIZE, 6*8, SPRITE_SIZE, SPRITE_SIZE);
-		side = SpriteSheet.getSpriteImage(2*SPRITE_SIZE, 6*8, SPRITE_SIZE, SPRITE_SIZE);
-		frontWalk = SpriteSheet.getSpriteImage(3*SPRITE_SIZE, 6*8, SPRITE_SIZE, SPRITE_SIZE);
-		backWalk = SpriteSheet.getSpriteImage(4*SPRITE_SIZE, 6*8, SPRITE_SIZE, SPRITE_SIZE);
-		sideWalk = SpriteSheet.getSpriteImage(5*SPRITE_SIZE, 6*8, SPRITE_SIZE, SPRITE_SIZE);
-		sideItem = SpriteSheet.getSpriteImage(6*SPRITE_SIZE, 6*8, SPRITE_SIZE, SPRITE_SIZE);
-		sideWalk2 = SpriteSheet.getSpriteImage(7*SPRITE_SIZE, 6*8, SPRITE_SIZE, SPRITE_SIZE);
+		front = SpriteSheet.getSpriteImage(0, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+		back = SpriteSheet.getSpriteImage(1*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+		side = SpriteSheet.getSpriteImage(2*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+		frontWalk = SpriteSheet.getSpriteImage(3*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+		backWalk = SpriteSheet.getSpriteImage(4*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+		sideWalk = SpriteSheet.getSpriteImage(5*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+		sideItem = SpriteSheet.getSpriteImage(6*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
+		sideWalk2 = SpriteSheet.getSpriteImage(7*SPRITE_SIZE, 3*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
 		
 		//health
 		heart = SpriteSheet.getSpriteImage(26*8, 17*8, Display.ICON_SIZE, Display.ICON_SIZE);
@@ -383,7 +374,16 @@ public class Player extends Mob {
 		emptyHeart = SpriteSheet.getSpriteImage(28*8, 17*8, Display.ICON_SIZE, Display.ICON_SIZE);
 		
 		//gui
-		border = SpriteSheet.getSpriteImage(0, 19*8, 16, 16);
+		border = SpriteSheet.getSpriteImage(0, 19*8, SPRITE_SIZE, SPRITE_SIZE);
+	}
+	
+	@Override
+	protected void initHitbox() {
+		rect = new Rectangle();
+		rect.x = 2;
+		rect.y = 6;	
+		rect.width = 7;
+		rect.height = 9;
 	}
 
 	public Rectangle getRect() {
@@ -412,19 +412,19 @@ public class Player extends Mob {
 
 	public void placeTile(Tile tile) {
 		switch (lastDir) {
-			case 'u' -> ((Level) game.getLevel()).addTile(5, getCenterX(), getCenterY() - BUILD_REACH);
-			case 'd' -> ((Level) game.getLevel()).addTile(5, getCenterX(), getCenterY() + BUILD_REACH);
-			case 'l' -> ((Level) game.getLevel()).addTile(5, getCenterX() - BUILD_REACH, getCenterY());
-			case 'r' -> ((Level) game.getLevel()).addTile(5, getCenterX() + BUILD_REACH, getCenterY());
+			case 'u' -> level.addTile(5, getCenterX(), getCenterY() - BUILD_REACH);
+			case 'd' -> level.addTile(5, getCenterX(), getCenterY() + BUILD_REACH);
+			case 'l' -> level.addTile(5, getCenterX() - BUILD_REACH, getCenterY());
+			case 'r' -> level.addTile(5, getCenterX() + BUILD_REACH, getCenterY());
 		}
 	}
 	
 	public void removeTile() {
 		switch (lastDir) {
-			case 'u' -> ((Level) game.getLevel()).removeTile(getCenterX(), getCenterY() - BUILD_REACH);
-			case 'd' -> ((Level) game.getLevel()).removeTile(getCenterX(), getCenterY() + BUILD_REACH);
-			case 'l' -> ((Level) game.getLevel()).removeTile(getCenterX() - BUILD_REACH, getCenterY());
-			case 'r' -> ((Level) game.getLevel()).removeTile(getCenterX() + BUILD_REACH, getCenterY());
+			case 'u' -> level.removeTile(getCenterX(), getCenterY() - BUILD_REACH);
+			case 'd' -> level.removeTile(getCenterX(), getCenterY() + BUILD_REACH);
+			case 'l' -> level.removeTile(getCenterX() - BUILD_REACH, getCenterY());
+			case 'r' -> level.removeTile(getCenterX() + BUILD_REACH, getCenterY());
 		}
 	}
 
@@ -469,13 +469,13 @@ public class Player extends Mob {
 				y -= knockbackSpeed;
 				walking = true;
 				if (y >= screenCenterY && y < map.ph - screenCenterY) {
-					game.getDisplay().yScroll--;
+					game.getDisplay().yScroll -= knockbackSpeed;
 				}
 				if (isCollision()) {
 					y += knockbackSpeed;
 					walking = false;
 					if (y >= screenCenterY && y < map.ph - screenCenterY) {
-						game.getDisplay().yScroll++;
+						game.getDisplay().yScroll += knockbackSpeed;
 					}
 					return;
 				}
@@ -544,12 +544,16 @@ public class Player extends Mob {
 			case 'l' -> xDist -= REACH;
 			case 'r' -> xDist += REACH;
 		}
-		level.addEntity(new ItemEntity(getActiveItem(), getActiveItem().getImage(), x + xDist, y + yDist));
+		if (getActiveItem() != null) {
+			level.addEntity(new ItemEntity(getActiveItem(), getActiveItem().getImage(), x + xDist, y + yDist));
+		}
 	}
 	
 	public void dropItem(int slot) {
 		throwItem(getItem(slot));
-		inventory.removeItem(getItem(slot).getClass());
+		if (getActiveItem() != null) {
+			inventory.removeItem(getItem(slot).getClass());
+		}
 	}
 
 	public void setLevel(Level level) {

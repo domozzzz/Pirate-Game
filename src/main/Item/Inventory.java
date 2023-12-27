@@ -8,10 +8,8 @@ public class Inventory {
 	public void add(Class<?> className, int num) {
 		for (int i = 0; i < num; i++) {
 			try {
-				add((Item) className.newInstance());
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
+				add((Item)className.newInstance());
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}

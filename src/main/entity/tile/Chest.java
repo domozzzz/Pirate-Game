@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 
 import main.Game;
 import main.Level;
+import main.Sound;
 import main.Item.Food;
 import main.gfx.SpriteSheet;
 
@@ -34,6 +35,7 @@ public class Chest extends Tile {
 			level.getPlayer().getInventory().add(new Food());
 			level.getPlayer().getInventory().add(new Food());
 			level.getPlayer().getInventory().add(new Food());
+			Sound.open.play();
 			opened = true;
 		}	
 	}
